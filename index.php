@@ -11,8 +11,7 @@ $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?></title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIINfQ3R8mZ4wY5M0gYyK2r1Y8n8L0pK1s=" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -58,6 +57,19 @@ $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
                     </div>
                 </div>
 
+                <div class="panel-section barangay-section">
+                    <div class="section-heading">
+                        <h2>Barangays</h2>
+                        <span class="layer-count">1 area</span>
+                    </div>
+                    <div class="barangay-filters" role="group" aria-label="Filter map by barangay">
+                        <button class="barangay-filter is-active" type="button" data-lat="8.3675" data-lng="124.864">
+                            <span class="barangay-marker"></span>
+                            Tankulan
+                        </button>
+                    </div>
+                </div>
+
                 <div class="panel-section summary-section">
                     <p class="eyebrow">2026 overview</p>
                     <div class="metric"><strong>2,510</strong><span>hectares mapped</span></div>
@@ -88,13 +100,14 @@ $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
                     <span><i class="legend-dot legend-dot--excellent"></i>80+ tons</span>
                     <span><i class="legend-dot legend-dot--moderate"></i>50-79 tons</span>
                     <span><i class="legend-dot legend-dot--low"></i>20-49 tons</span>
+                    <span><i class="legend-line"></i>Manolo Fortich boundary</span>
+                    <span><i class="legend-line legend-line--tankulan"></i>Tankulan boundary</span>
                 </div>
             </section>
         </section>
     </main>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
