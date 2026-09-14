@@ -332,6 +332,10 @@ dd {
     position: relative;
 }
 
+.leaflet-pane.leaflet-tankulan-boundary-pane {
+    z-index: 650;
+}
+
 #map {
     height: 590px;
     width: 100%;
@@ -345,8 +349,24 @@ dd {
     z-index: 500;
 }
 
+.leaflet-control-layers {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    box-shadow: 0 5px 20px rgba(34, 53, 47, .12);
+    color: var(--ink);
+    font-family: Arial, sans-serif;
+    font-size: .72rem;
+}
+
+.leaflet-control-layers label {
+    cursor: pointer;
+}
+
 .map-title {
     align-items: center;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
     display: flex;
     gap: .65rem;
     left: 1rem;
