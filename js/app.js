@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.getPane('municipal-boundary').style.zIndex = 350;
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
-    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const roadsFarmlandLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 18
     });
@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         maxZoom: 18
     });
 
-    streetLayer.addTo(map);
+    roadsFarmlandLayer.addTo(map);
     L.control.layers({
-        Streets: streetLayer,
+        'Roads + farmland': roadsFarmlandLayer,
         Satellite: satelliteLayer
     }, null, { position: 'topright', collapsed: false }).addTo(map);
 
