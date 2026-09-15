@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     fillColor: '#8ebc8d',
                     fillOpacity: 0.08,
                     weight: 3
-                }
+                },
+                interactive: false
             }).addTo(map);
 
             municipalBoundary.bindTooltip('Manolo Fortich municipal boundary', { direction: 'center' });
@@ -190,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeButton) {
                 focusBarangay(activeButton);
             }
-            municipalBoundary?.bringToFront();
         })
         .catch((error) => console.warn(error.message));
 
