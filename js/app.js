@@ -117,12 +117,35 @@ document.addEventListener('DOMContentLoaded', () => {
             color: '#166534',
             fillColor: '#22c55e',
             fillOpacity: 0.1,
-            weight: 2
+            weight: 2,
+            className: 'barangay-polygon'
         },
         onEachFeature: (feature, layer) => {
             const name = normalizeBarangayName(feature.properties.ADM4_EN);
             layer.bindTooltip(name, { direction: 'center' });
             layer.bindPopup(`<strong>Barangay ${name}</strong><br>PSGC: ${feature.properties.ADM4_PCODE}`);
+            layer.on('mouseover', () => {
+                if (!layer.getPopup()?.isOpen()) {
+                    layer.setStyle({ weight: 3, fillOpacity: 0.16 });
+                }
+                layer.bringToFront();
+            });
+            layer.on('mouseout', () => {
+                if (!layer.getPopup()?.isOpen()) {
+                    const isActive = document.querySelector('.barangay-filter.is-active')?.dataset.name === name;
+                    layer.setStyle(isActive ? {
+                        color: '#b0673b',
+                        fillColor: '#d8a276',
+                        fillOpacity: 0.42,
+                        weight: 4
+                    } : {
+                        color: '#166534',
+                        fillColor: '#22c55e',
+                        fillOpacity: 0.04,
+                        weight: 1
+                    });
+                }
+            });
             layer.on('click', () => {
                 const button = barangayButtons.find((item) => item.dataset.name === name);
                 if (button) {
