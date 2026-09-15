@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let municipalBoundary;
     const boundaryUrl = 'https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1&q=Manolo%20Fortich%2C%20Bukidnon%2C%20Philippines';
-    fetch(boundaryUrl)
+    const municipalGeometryPromise = fetch(boundaryUrl)
         .then((response) => {
             if (!response.ok) {
                 throw new Error('Unable to load the municipal boundary.');
@@ -44,8 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
             municipalBoundary.bindTooltip('Manolo Fortich municipal boundary', { direction: 'center' });
             map.fitBounds(municipalBoundary.getBounds().pad(0.06));
             municipalBoundary.bringToFront();
+
+            return places[0].geojson;
         })
-        .catch((error) => console.warn(error.message));
+        .catch((error) => {
+            console.warn(error.message);
+            return null;
+        });
 
     const selectedName = document.querySelector('#selected-name');
     const selectedCrop = document.querySelector('#selected-crop');
@@ -106,15 +111,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }).addTo(map);
 
-    fetch('public/data/manolo-fortich-barangays.geojson')
-        .then((response) => {
+    Promise.all([
+        municipalGeometryPromise,
+        fetch('public/data/manolo-fortich-barangays.geojson')
+    ])
+        .then(([municipalGeometry, response]) => {
             if (!response.ok) {
                 throw new Error('Unable to load barangay boundaries.');
             }
-            return response.json();
+            return response.json().then((data) => ({ data, municipalGeometry }));
         })
-        .then((data) => {
-            barangayBoundaryLayer.addData(data);
+        .then(({ data, municipalGeometry }) => {
+            const municipalFeature = municipalGeometry ? turf.feature(municipalGeometry) : null;
+            const clippedFeatures = municipalFeature
+                ? data.features.map((feature) => {
+                    const clippedFeature = turf.intersect(turf.featureCollection([feature, municipalFeature]));
+                    return clippedFeature ? { ...clippedFeature, properties: feature.properties } : feature;
+                })
+                : data.features;
+            const clippedData = { ...data, features: clippedFeatures };
+            barangayBoundaryLayer.addData(clippedData);
 
             map.fitBounds(barangayBoundaryLayer.getBounds().pad(0.06));
             municipalBoundary?.bringToFront();
