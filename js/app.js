@@ -177,9 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(({ data, municipalGeometry }) => {
             const municipalFeature = municipalGeometry ? turf.feature(municipalGeometry) : null;
             const clippedFeatures = municipalFeature
-                ? data.features.map((feature) => {
+                ? data.features.flatMap((feature) => {
                     const clippedFeature = turf.intersect(turf.featureCollection([feature, municipalFeature]));
-                    return clippedFeature ? { ...clippedFeature, properties: feature.properties } : feature;
+                    return clippedFeature ? [{ ...clippedFeature, properties: feature.properties }] : [];
                 })
                 : data.features;
             const clippedData = { ...data, features: clippedFeatures };
