@@ -3,7 +3,11 @@
 }
 
 .leaflet-interactive.barangay-polygon {
-        cursor: pointer;
+    cursor: pointer;
+}
+
+.leaflet-interactive.barangay-polygon:focus {
+    outline: none;
 }
 
 :root {
