@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { zoomControl: false }).setView([8.3675, 124.864], 12);
-    map.createPane('tankulan-boundary');
-    map.getPane('tankulan-boundary').style.zIndex = 650;
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -19,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Satellite: satelliteLayer
     }, null, { position: 'topright', collapsed: false }).addTo(map);
 
-    let tankulanBoundary;
+    let municipalBoundary;
     const boundaryUrl = 'https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1&q=Manolo%20Fortich%2C%20Bukidnon%2C%20Philippines';
     fetch(boundaryUrl)
         .then((response) => {
@@ -46,18 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             map.fitBounds(boundary.getBounds().pad(0.06));
             boundary.bringToFront();
 
-            tankulanBoundary = L.geoJSON(places[0].geojson, {
-                pane: 'tankulan-boundary',
-                style: {
-                    color: '#b0673b',
-                    fillColor: '#d8a276',
-                    fillOpacity: 0.08,
-                    weight: 4
-                }
-            }).addTo(map);
-
-            tankulanBoundary.bindTooltip('Tankulan boundary', { direction: 'center' });
-            tankulanBoundary.bringToFront();
+            municipalBoundary = boundary;
         })
         .catch((error) => console.warn(error.message));
 
@@ -75,18 +62,72 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedProduction.textContent = cropArea.production;
     }
 
-    document.querySelectorAll('.barangay-filter').forEach((button) => {
-        button.addEventListener('click', () => {
-            document.querySelector('.barangay-filter.is-active')?.classList.remove('is-active');
-            button.classList.add('is-active');
+    const barangayLayers = new Map();
+    const barangayButtons = [...document.querySelectorAll('.barangay-filter')];
 
-            if (tankulanBoundary) {
-                map.fitBounds(tankulanBoundary.getBounds().pad(0.12));
-                tankulanBoundary.bringToFront();
-                return;
+    function normalizeBarangayName(name) {
+        return name.replace(/ \(Pob\.\)$/, '');
+    }
+
+    function focusBarangay(button) {
+        document.querySelector('.barangay-filter.is-active')?.classList.remove('is-active');
+        button.classList.add('is-active');
+
+        const coordinates = [Number(button.dataset.lat), Number(button.dataset.lng)];
+        map.setView(coordinates, 14);
+        const layer = barangayLayers.get(button.dataset.name);
+        layer?.openPopup();
+        selectArea({
+            name: `Barangay ${button.dataset.name}`,
+            crop: 'Corn',
+            area: '38 hectares',
+            yield: '4.3 tons/ha',
+            production: '163.4 tons'
+        });
+    }
+
+    const barangayBoundaryLayer = L.geoJSON(null, {
+        style: {
+            color: '#166534',
+            fillColor: '#22c55e',
+            fillOpacity: 0.1,
+            weight: 2
+        },
+        onEachFeature: (feature, layer) => {
+            const name = normalizeBarangayName(feature.properties.ADM4_EN);
+            layer.bindTooltip(name, { direction: 'center' });
+            layer.bindPopup(`<strong>Barangay ${name}</strong><br>PSGC: ${feature.properties.ADM4_PCODE}`);
+            layer.on('click', () => {
+                const button = barangayButtons.find((item) => item.dataset.name === name);
+                if (button) {
+                    focusBarangay(button);
+                }
+            });
+            barangayLayers.set(name, layer);
+        }
+    }).addTo(map);
+
+    fetch('public/data/manolo-fortich-barangays.geojson')
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Unable to load barangay boundaries.');
             }
+            return response.json();
+        })
+        .then((data) => {
+            barangayBoundaryLayer.addData(data);
+            map.fitBounds(barangayBoundaryLayer.getBounds().pad(0.06));
+            municipalBoundary?.bringToFront();
+        })
+        .catch((error) => console.warn(error.message));
 
-            map.setView([Number(button.dataset.lat), Number(button.dataset.lng)], 13);
+    barangayButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            focusBarangay(button);
         });
     });
+
+    if (municipalBoundary) {
+        municipalBoundary.bringToFront();
+    }
 });

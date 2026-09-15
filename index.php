@@ -4,6 +4,30 @@ declare(strict_types=1);
 
 $pageTitle = 'Lambo | Agricultural Mapping';
 $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
+$barangays = [
+    ['name' => 'Agusan Canyon', 'lat' => 8.3231476, 'lng' => 124.8098936],
+    ['name' => 'Alae', 'lat' => 8.4226348, 'lng' => 124.8142500],
+    ['name' => 'Dahilayan', 'lat' => 8.2194543, 'lng' => 124.8518877],
+    ['name' => 'Dalirig', 'lat' => 8.3761865, 'lng' => 124.9020104],
+    ['name' => 'Damilag', 'lat' => 8.3532435, 'lng' => 124.8130550],
+    ['name' => 'Diclum', 'lat' => 8.3662163, 'lng' => 124.8640582],
+    ['name' => 'Guilang-guilang', 'lat' => 8.4576456, 'lng' => 125.0414649],
+    ['name' => 'Kalugmanan', 'lat' => 8.2775977, 'lng' => 124.8609549],
+    ['name' => 'Lindaban', 'lat' => 8.2896129, 'lng' => 124.8468613],
+    ['name' => 'Lingion', 'lat' => 8.4030713, 'lng' => 124.8890161],
+    ['name' => 'Lunocan', 'lat' => 8.4321330, 'lng' => 124.8397476],
+    ['name' => 'Maluko', 'lat' => 8.3752947, 'lng' => 124.9557620],
+    ['name' => 'Mambatangan', 'lat' => 8.4680463, 'lng' => 124.7902289],
+    ['name' => 'Mampayag', 'lat' => 8.2621814, 'lng' => 124.8309946],
+    ['name' => 'Mantibugao', 'lat' => 8.4584139, 'lng' => 124.8237712],
+    ['name' => 'Minsuro', 'lat' => 8.5102873, 'lng' => 124.8308165],
+    ['name' => 'San Miguel', 'lat' => 8.3892787, 'lng' => 124.8354203],
+    ['name' => 'Sankanan', 'lat' => 8.3169107, 'lng' => 124.8583317],
+    ['name' => 'Santiago', 'lat' => 8.4366987, 'lng' => 124.9961035],
+    ['name' => 'Santo Niño', 'lat' => 8.4306977, 'lng' => 124.8643613],
+    ['name' => 'Tankulan', 'lat' => 8.3662163, 'lng' => 124.8640582],
+    ['name' => 'Ticala', 'lat' => 8.3404235, 'lng' => 124.8922333],
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -60,13 +84,15 @@ $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
                 <div class="panel-section barangay-section">
                     <div class="section-heading">
                         <h2>Barangays</h2>
-                        <span class="layer-count">1 area</span>
+                        <span class="layer-count"><?= count($barangays) ?> areas</span>
                     </div>
                     <div class="barangay-filters" role="group" aria-label="Filter map by barangay">
-                        <button class="barangay-filter is-active" type="button" data-lat="8.3675" data-lng="124.864">
-                            <span class="barangay-marker"></span>
-                            Tankulan
-                        </button>
+                        <?php foreach ($barangays as $index => $barangay): ?>
+                            <button class="barangay-filter<?= $index === 0 ? ' is-active' : '' ?>" type="button" data-name="<?= htmlspecialchars($barangay['name'], ENT_QUOTES, 'UTF-8') ?>" data-lat="<?= $barangay['lat'] ?>" data-lng="<?= $barangay['lng'] ?>">
+                                <span class="barangay-marker"></span>
+                                <?= htmlspecialchars($barangay['name'], ENT_QUOTES, 'UTF-8') ?>
+                            </button>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 
@@ -101,7 +127,7 @@ $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
                     <span><i class="legend-dot legend-dot--moderate"></i>50-79 tons</span>
                     <span><i class="legend-dot legend-dot--low"></i>20-49 tons</span>
                     <span><i class="legend-line"></i>Manolo Fortich boundary</span>
-                    <span><i class="legend-line legend-line--tankulan"></i>Tankulan boundary</span>
+                    <span><i class="legend-line legend-line--barangay"></i>Barangay boundaries</span>
                 </div>
             </section>
         </section>
