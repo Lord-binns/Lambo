@@ -44,14 +44,14 @@ $barangays = [
             <span class="brand-mark">L</span>
             <span>Lambo</span>
         </a>
-        <span class="location-label">Manolo Fortich Agricultural Map</span>
+        <span class="location-label">Smart Agricultural Map</span>
         <span class="status-badge"><span class="status-dot"></span>Data preview</span>
     </header>
 
     <main class="app-shell">
         <section class="page-heading">
             <div>
-                <p class="eyebrow">Municipal agriculture</p>
+                <p class="eyebrow">Created by Lord-binns</p>
                 <h1>Know what is growing.<br><em>Plan what comes next.</em></h1>
                 <p class="intro">Explore crop areas across Manolo Fortich and review the current yield outlook.</p>
             </div>
