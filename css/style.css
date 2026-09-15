@@ -230,6 +230,9 @@ h2 {
 .barangay-filters {
     display: grid;
     gap: .35rem;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: .35rem;
 }
 
 .barangay-filter {
@@ -260,6 +263,13 @@ h2 {
     height: 10px;
     position: relative;
     width: 10px;
+}
+
+.legend-line--barangay {
+    background: #246247;
+    border-radius: 50%;
+    height: 8px;
+    width: 8px;
 }
 
 .barangay-marker::after {
