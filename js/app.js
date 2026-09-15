@@ -179,12 +179,34 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(({ data, municipalGeometry }) => {
             const municipalFeature = municipalGeometry ? turf.feature(municipalGeometry) : null;
-            const clippedFeatures = municipalFeature
+            let clippedFeatures = municipalFeature
                 ? data.features.flatMap((feature) => {
                     const clippedFeature = turf.intersect(turf.featureCollection([feature, municipalFeature]));
                     return clippedFeature ? [{ ...clippedFeature, properties: feature.properties }] : [];
                 })
                 : data.features;
+
+            if (municipalFeature && clippedFeatures.length) {
+                const barangayUnion = turf.union(turf.featureCollection(clippedFeatures));
+                const uncoveredArea = barangayUnion
+                    ? turf.difference(turf.featureCollection([municipalFeature, barangayUnion]))
+                    : municipalFeature;
+
+                if (uncoveredArea) {
+                    turf.flatten(uncoveredArea).features.forEach((gap) => {
+                        const gapCenter = turf.centroid(gap);
+                        const target = clippedFeatures.reduce((closest, feature) => {
+                            const distance = turf.distance(gapCenter, turf.centroid(feature));
+                            return distance < closest.distance ? { feature, distance } : closest;
+                        }, { feature: clippedFeatures[0], distance: Infinity }).feature;
+                        const extendedFeature = turf.union(turf.featureCollection([target, gap]));
+                        if (extendedFeature) {
+                            target.geometry = extendedFeature.geometry;
+                        }
+                    });
+                }
+            }
+
             const clippedData = { ...data, features: clippedFeatures };
             barangayBoundaryLayer.addData(clippedData);
 
