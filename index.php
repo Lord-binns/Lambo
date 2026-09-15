@@ -87,8 +87,8 @@ $barangays = [
                         <span class="layer-count"><?= count($barangays) ?> areas</span>
                     </div>
                     <div class="barangay-filters" role="group" aria-label="Filter map by barangay">
-                        <?php foreach ($barangays as $index => $barangay): ?>
-                            <button class="barangay-filter<?= $index === 0 ? ' is-active' : '' ?>" type="button" data-name="<?= htmlspecialchars($barangay['name'], ENT_QUOTES, 'UTF-8') ?>" data-lat="<?= $barangay['lat'] ?>" data-lng="<?= $barangay['lng'] ?>">
+                        <?php foreach ($barangays as $barangay): ?>
+                            <button class="barangay-filter" type="button" data-name="<?= htmlspecialchars($barangay['name'], ENT_QUOTES, 'UTF-8') ?>" data-lat="<?= $barangay['lat'] ?>" data-lng="<?= $barangay['lng'] ?>">
                                 <span class="barangay-marker"></span>
                                 <?= htmlspecialchars($barangay['name'], ENT_QUOTES, 'UTF-8') ?>
                             </button>

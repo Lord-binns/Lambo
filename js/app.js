@@ -187,10 +187,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             map.fitBounds(barangayBoundaryLayer.getBounds().pad(0.06));
 
-            const activeButton = document.querySelector('.barangay-filter.is-active');
-            if (activeButton) {
-                focusBarangay(activeButton);
-            }
         })
         .catch((error) => console.warn(error.message));
 
