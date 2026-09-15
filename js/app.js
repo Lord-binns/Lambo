@@ -16,13 +16,66 @@ document.addEventListener('DOMContentLoaded', () => {
         attribution: 'Tiles &copy; Esri',
         maxZoom: 18
     });
+    const sentinelConfig = window.sentinelHubConfig || {};
+    const satelliteMonth = document.querySelector('#satellite-month');
+    const ndviToggle = document.querySelector('#ndvi-toggle');
+    const sentinelStatus = document.querySelector('#sentinel-status');
+    let sentinelTrueColorLayer;
+    let sentinelNdviLayer;
+    let ndviVisible = false;
+
+    function createSentinelLayer(layerName) {
+        const tokenSeparator = sentinelConfig.url.includes('?') ? '&' : '?';
+        return L.tileLayer.wms(`${sentinelConfig.url}${tokenSeparator}access_token=${encodeURIComponent(sentinelConfig.token)}`, {
+            attribution: '&copy; Copernicus Sentinel data 2026, Sentinel Hub',
+            layers: layerName,
+            format: 'image/png',
+            maxcc: 40,
+            time: satelliteMonth.value,
+            transparent: layerName === 'NDVI',
+            version: '1.3.0'
+        });
+    }
+
+    if (sentinelConfig.url && sentinelConfig.token) {
+        sentinelTrueColorLayer = createSentinelLayer('TRUE_COLOR');
+        sentinelNdviLayer = createSentinelLayer('NDVI');
+        ndviToggle.disabled = false;
+        sentinelStatus.textContent = 'Sentinel-2 imagery ready. Choose a month to compare vegetation.';
+    } else {
+        sentinelStatus.textContent = 'Sentinel-2 is not configured yet. Add Sentinel Hub settings to enable monitoring.';
+    }
 
     streetLayer.addTo(map);
     L.control.layers({
         Streets: streetLayer,
         'Roads + Farmland': farmlandLayer,
-        Satellite: satelliteLayer
+        Satellite: satelliteLayer,
+        ...(sentinelTrueColorLayer ? { 'Sentinel-2 true color': sentinelTrueColorLayer } : {})
     }, null, { position: 'topright', collapsed: false }).addTo(map);
+
+    satelliteMonth.addEventListener('change', () => {
+        if (!sentinelTrueColorLayer || !sentinelNdviLayer) {
+            return;
+        }
+        sentinelTrueColorLayer.setParams({ time: satelliteMonth.value });
+        sentinelNdviLayer.setParams({ time: satelliteMonth.value });
+        sentinelStatus.textContent = `Sentinel-2 observation window: ${satelliteMonth.options[satelliteMonth.selectedIndex].text}`;
+    });
+
+    ndviToggle.addEventListener('click', () => {
+        if (!sentinelNdviLayer) {
+            return;
+        }
+        ndviVisible = !ndviVisible;
+        if (ndviVisible) {
+            sentinelNdviLayer.addTo(map);
+            ndviToggle.textContent = 'Hide NDVI';
+        } else {
+            map.removeLayer(sentinelNdviLayer);
+            ndviToggle.textContent = 'Show NDVI';
+        }
+    });
 
     let municipalBoundary;
     const boundaryUrl = 'https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1&q=Manolo%20Fortich%2C%20Bukidnon%2C%20Philippines';

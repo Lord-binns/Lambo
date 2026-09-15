@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 $pageTitle = 'Lambo | Agricultural Mapping';
 $cropOptions = ['All crops', 'Corn', 'Rice', 'Cassava'];
+$sentinelHubUrl = getenv('SENTINEL_HUB_WMS_URL') ?: '';
+$sentinelHubToken = getenv('SENTINEL_HUB_TOKEN') ?: '';
 $barangays = [
     ['name' => 'Agusan Canyon', 'lat' => 8.3231476, 'lng' => 124.8098936],
     ['name' => 'Alae', 'lat' => 8.4226348, 'lng' => 124.8142500],
@@ -61,6 +63,24 @@ $barangays = [
                     <option>2026</option>
                     <option>2025</option>
                 </select>
+            </div>
+        </section>
+
+        <section class="monitoring-bar" aria-label="Satellite monitoring controls">
+            <div>
+                <p class="eyebrow">Satellite monitoring</p>
+                <strong>Sentinel-2 field observation</strong>
+                <span id="sentinel-status">Configure Sentinel Hub to load imagery and NDVI.</span>
+            </div>
+            <div class="monitoring-controls">
+                <label for="satellite-month">Observation month</label>
+                <select id="satellite-month" name="satellite-month">
+                    <option value="2026-06-01/2026-06-30">June 2026</option>
+                    <option value="2026-07-01/2026-07-31">July 2026</option>
+                    <option value="2026-08-01/2026-08-31">August 2026</option>
+                    <option value="2026-09-01/2026-09-30">September 2026</option>
+                </select>
+                <button id="ndvi-toggle" class="monitoring-button" type="button" disabled>Show NDVI</button>
             </div>
         </section>
 
@@ -135,6 +155,12 @@ $barangays = [
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7/turf.min.js"></script>
+    <script>
+        window.sentinelHubConfig = <?= json_encode([
+            'url' => $sentinelHubUrl,
+            'token' => $sentinelHubToken,
+        ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+    </script>
     <script src="js/app.js"></script>
 </body>
 </html>
