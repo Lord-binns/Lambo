@@ -18,35 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, null, { position: 'topright', collapsed: false }).addTo(map);
 
     let municipalBoundary;
-    const boundaryUrl = 'https://nominatim.openstreetmap.org/search?format=jsonv2&polygon_geojson=1&limit=1&q=Manolo%20Fortich%2C%20Bukidnon%2C%20Philippines';
-    fetch(boundaryUrl)
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Unable to load the municipal boundary.');
-            }
-            return response.json();
-        })
-        .then((places) => {
-            if (!places[0]?.geojson) {
-            }
-
-            const boundary = L.geoJSON(places[0].geojson, {
-                style: {
-                    color: '#246247',
-                    dashArray: '8 7',
-                    fillColor: '#8ebc8d',
-                    fillOpacity: 0.08,
-                    weight: 3
-                }
-            }).addTo(map);
-
-            boundary.bindTooltip('Manolo Fortich municipal boundary', { direction: 'center' });
-            map.fitBounds(boundary.getBounds().pad(0.06));
-            boundary.bringToFront();
-
-            municipalBoundary = boundary;
-        })
-        .catch((error) => console.warn(error.message));
 
     const selectedName = document.querySelector('#selected-name');
     const selectedCrop = document.querySelector('#selected-crop');
@@ -116,6 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then((data) => {
             barangayBoundaryLayer.addData(data);
+
+            const dissolvedBoundary = turf.union(turf.featureCollection(data.features));
+            municipalBoundary = L.geoJSON(dissolvedBoundary, {
+                style: {
+                    color: '#246247',
+                    dashArray: '8 7',
+                    fillOpacity: 0,
+                    weight: 3
+                }
+            }).addTo(map);
+            municipalBoundary.bindTooltip('Manolo Fortich municipal boundary', { direction: 'center' });
             map.fitBounds(barangayBoundaryLayer.getBounds().pad(0.06));
             municipalBoundary?.bringToFront();
         })
@@ -127,7 +109,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    if (municipalBoundary) {
-        municipalBoundary.bringToFront();
-    }
 });
