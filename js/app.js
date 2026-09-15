@@ -73,13 +73,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return name.replace(/ \(Pob\.\)$/, '');
     }
 
+    function setBarangayHighlight(selectedLayer) {
+        barangayLayers.forEach((layer) => {
+            layer.setStyle(layer === selectedLayer ? {
+                color: '#b0673b',
+                fillColor: '#d8a276',
+                fillOpacity: 0.42,
+                weight: 4
+            } : {
+                color: '#166534',
+                fillColor: '#22c55e',
+                fillOpacity: 0.04,
+                weight: 1
+            });
+        });
+        municipalBoundary?.bringToFront();
+        selectedLayer?.bringToFront();
+    }
+
     function focusBarangay(button) {
         document.querySelector('.barangay-filter.is-active')?.classList.remove('is-active');
         button.classList.add('is-active');
 
-        const coordinates = [Number(button.dataset.lat), Number(button.dataset.lng)];
-        map.setView(coordinates, 14);
         const layer = barangayLayers.get(button.dataset.name);
+        if (layer) {
+            setBarangayHighlight(layer);
+            map.fitBounds(layer.getBounds().pad(0.15));
+        } else {
+            map.setView([Number(button.dataset.lat), Number(button.dataset.lng)], 14);
+        }
         layer?.openPopup();
         selectArea({
             name: `Barangay ${button.dataset.name}`,
@@ -133,6 +155,11 @@ document.addEventListener('DOMContentLoaded', () => {
             barangayBoundaryLayer.addData(clippedData);
 
             map.fitBounds(barangayBoundaryLayer.getBounds().pad(0.06));
+
+            const activeButton = document.querySelector('.barangay-filter.is-active');
+            if (activeButton) {
+                focusBarangay(activeButton);
+            }
             municipalBoundary?.bringToFront();
         })
         .catch((error) => console.warn(error.message));
