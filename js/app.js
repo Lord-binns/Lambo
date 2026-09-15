@@ -91,25 +91,34 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedLayer?.bringToFront();
     }
 
-    function focusBarangay(button) {
+    function activateBarangay(name, layer, button) {
         document.querySelector('.barangay-filter.is-active')?.classList.remove('is-active');
-        button.classList.add('is-active');
+        button?.classList.add('is-active');
 
-        const layer = barangayLayers.get(button.dataset.name);
         if (layer) {
             setBarangayHighlight(layer);
             map.fitBounds(layer.getBounds().pad(0.15));
-        } else {
-            map.setView([Number(button.dataset.lat), Number(button.dataset.lng)], 14);
+            layer.bringToFront();
+            layer.openPopup();
         }
-        layer?.openPopup();
         selectArea({
-            name: `Barangay ${button.dataset.name}`,
+            name: `Barangay ${name}`,
             crop: 'Corn',
             area: '38 hectares',
             yield: '4.3 tons/ha',
             production: '163.4 tons'
         });
+    }
+
+    function focusBarangay(button) {
+        const layer = barangayLayers.get(button.dataset.name);
+        if (layer) {
+            activateBarangay(button.dataset.name, layer, button);
+            return;
+        }
+
+        button.classList.add('is-active');
+        map.setView([Number(button.dataset.lat), Number(button.dataset.lng)], 14);
     }
 
     const barangayBoundaryLayer = L.geoJSON(null, {
@@ -148,9 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             layer.on('click', () => {
                 const button = barangayButtons.find((item) => item.dataset.name === name);
-                if (button) {
-                    focusBarangay(button);
-                }
+                activateBarangay(name, layer, button);
             });
             barangayLayers.set(name, layer);
         }
