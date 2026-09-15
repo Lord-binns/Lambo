@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { zoomControl: false }).setView([8.3675, 124.864], 12);
+    map.createPane('municipal-boundary');
+    map.getPane('municipal-boundary').style.zIndex = 350;
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
     const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -32,11 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             municipalBoundary = L.geoJSON(places[0].geojson, {
+                pane: 'municipal-boundary',
                 style: {
                     color: '#246247',
                     dashArray: '8 7',
                     fillColor: '#8ebc8d',
-                    fillOpacity: 0.08,
+                    fillOpacity: 0.22,
                     weight: 3
                 },
                 interactive: false
